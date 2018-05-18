@@ -157,9 +157,6 @@ var sdk = (function(root) {
 
 						for(var i in _XT) {
 								switch(_XT[i][0]) {
-										case 'auth':
-												collect.auth = _XT[i][1];
-												break;
 										case 'Target':
 												collect.target = _XT[i].slice(1);
 												break;
@@ -228,7 +225,6 @@ var sdk = (function(root) {
 				xhr.setRequestHeader('X-Source-Url', encodeURI(collect.sourceUrl))
 				xhr.setRequestHeader('X-Current-Url', encodeURI(collect.currentUrl))
 				xhr.setRequestHeader('X-User-Id',sessionStorage.getItem('userId')||' ') //混合应用，可能会变
-				xhr.setRequestHeader('X-Auth', collect.auth)
 				xhr.withCredentials = false;
 
 				xhr.send(JSON.stringify(obj))
@@ -244,7 +240,6 @@ var sdk = (function(root) {
 				}
 
 				xhr.open('POST',url)
-				xhr.setRequestHeader('X-Auth', collect.auth)
 				xhr.setRequestHeader('X-Device-Id', collect.deviceId)
 				xhr.withCredentials = false
 
@@ -297,7 +292,6 @@ var sdk = (function(root) {
 
 				var url =  url +'&'+ helper.changeJSON2Query(obj)+ '&random=' +Math.random();
 				xhr.open('GET',url)
-				xhr.setRequestHeader('X-Auth', collect.auth)
 				xhr.setRequestHeader('X-User-Id', sessionStorage.getItem('userId')?sessionStorage.getItem('userId'):' ')
 
 				xhr.withCredentials = false;
