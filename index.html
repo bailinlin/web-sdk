@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>SDK测试问题记录</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+</head>
+<body>
+
+<div><a href="#">点击 A 标签</a></div>
+
+<p>点击 P 标签</p>
+
+<div>点击 DIV 标签</div>
+
+<button id="userId-event">模拟用户登录之后取到userId，存储起来，没有userId之前的作为游客身份，用设备Id是被</button>
+
+<button id="customer-event">自定义事件，例如分享按钮</button>
+
+<button id="error-event">模拟用户 http 接口 500 ，业务方触发</button>
+
+<!--TODO 增加设备接口传参 USER-AGENT-->
+
+
+<div>sdk 暴露了3个接口供业务方调用，分别是存储  userId ，自定义事件触发， http 请求错误事件触发</div>
+
+</body>
+<script>
+		(function() {
+				var collect = document.createElement('script');
+				collect.type = 'text/javascript';
+				collect.async = true;
+				collect.src =  'http://collect.trc.com/index.js';
+				var s = document.getElementsByTagName('script')[0];
+				s.parentNode.insertBefore(collect, s);
+		})();
+
+		var _XT = [];
+
+  	_XT.push(['Target','div']);
+		_XT.push(['auth','93c55350e179a3676c905723e112b440']);
+
+		// 用户自定义收集字段
+		_XT.userConfig = {
+				dcpChannelCode: 've3dC41i'
+		};
+
+
+
+
+		/*_XT.syserror = [];*/
+		/*//记录客户端脚本错误
+		window.onerror = function(error) {
+				try {
+						var msg;
+						for (var i = 0; i < arguments.length; i++) {
+								if (i == 0 || i == 2) {
+										msg += " | " + arguments[i];
+								}
+						}
+						if (msg.length > 0 ) {
+								_XT.syserror.push('syserror:'+msg);
+						}
+						return true;
+				} catch (e) { };
+		};
+*/
+
+		var customerEventDOM = document.getElementById('customer-event')
+		var errorEventDOM = document.getElementById('error-event')
+		var userIdEventDOM = document.getElementById('userId-event')
+
+		errorExtraInfo = {'errorCode':500}
+
+		customerEventDOM.onclick = function () {
+				console.log('自定义事件')
+				sdk.dispatch('customEvent',customerEventDOM,{extraInfo:'extraInfo'})
+		}
+
+		errorEventDOM.onclick = function () {
+				console.log('某个 http 接口返回 500 了')
+				sdk.dispatch('httpError',errorEventDOM,errorExtraInfo)
+		}
+
+		userIdEventDOM.onclick = function () {
+				console.log('存储UserId')
+				sdk.storeUserId('test1111')
+		}
+
+</script>
+</html>

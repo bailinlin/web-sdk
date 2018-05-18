@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta content="width=device-width, initial-scale=1" name="viewport" />
+	<title>Title</title>
+</head>
+<body>
+获取设备id test test
+</body>
+<script>
+		var getDeviceId = function() {
+				return 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+						var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+						return v.toString(16);
+				});
+		};
+
+		var hasCreated = false
+		var _deviceId = ''
+
+
+		function getDeviceInfo() {
+				if(document.cookie){
+						var cookieArr = document.cookie.split(';')
+						if(!_deviceId){
+								for(var i=0;i<cookieArr.length;i++){
+										if(cookieArr[i].indexOf('deviceId')>-1){
+												hasCreated = true
+												_deviceId = cookieArr[i].split('=')[1]
+										}
+								}
+						}
+
+				}
+
+				if(!_deviceId && (sessionStorage.getItem('deviceId')||localStorage.getItem('deviceId'))){
+						hasCreated = true
+						_deviceId = sessionStorage.getItem('deviceId')||localStorage.getItem('deviceId')
+				}
+
+				if(!hasCreated) {
+						_deviceId =  getDeviceId()
+						document.cookie = 'deviceId=' + _deviceId
+						sessionStorage.setItem('deviceId',_deviceId)
+						localStorage.setItem('deviceId',_deviceId)
+				}
+		}
+
+
+		//回调函数
+		function receiveMessageFromIndex ( event ) {
+				console.log( 'receiveMessageFromIndex', event.data )
+				getDeviceInfo()
+				var data =  {
+						deviceId: _deviceId,
+						type:event.data
+				}
+
+				event.source.postMessage(data, '*');
+				console.info('回调函数获取信息',data)
+
+
+		}
+		//监听message事件
+		if(window.addEventListener){
+				window.addEventListener("message", receiveMessageFromIndex, false);
+		}else{
+				window.attachEvent("onmessage", receiveMessageFromIndex, false)
+		}
+
+
+</script>
+</html>
