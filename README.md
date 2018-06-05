@@ -1,5 +1,7 @@
 # 前端数据采集埋点 SDK 使用指南
 
+> [埋点脚本的实现原理了解一下]( https://github.com/bailinlin/web-sdk/issues)
+
 DCP 是用来采集用户行为数据的一个脚本，所以你需要将脚本通过 `script` 来引入到你的项目中去，引入方式入下
 
 ```
