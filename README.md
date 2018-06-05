@@ -138,7 +138,7 @@ storeUserId 是 SDK 暴露出的存储 userId 的方法，根据采集时间是�
 
 前端 nginx 配置，2个配置文件 
 
-1. collect.trc.com
+1. collect.xxx.com
 
     	server {
         listen 80;
@@ -154,7 +154,7 @@ storeUserId 是 SDK 暴露出的存储 userId 的方法，根据采集时间是�
         }    
       }
 
-1. collectiframe.trc.com
+1. collectiframe.xxx.com
 
     server {
         listen 80;
