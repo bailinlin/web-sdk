@@ -8,7 +8,7 @@ DCP 是用来采集用户行为数据的一个脚本，所以你需要将脚本�
 		var collect = document.createElement('script');
 		collect.type = 'text/javascript';
 		collect.async = true;
-		collect.src =  'http://collect.trc.com/index.js';
+		collect.src =  'http://collect.xxx.com/index.js';
 		var s = document.getElementsByTagName('script')[0];
 		s.parentNode.insertBefore(collect, s);
 	})();
@@ -24,7 +24,7 @@ DCP 是用来采集用户行为数据的一个脚本，所以你需要将脚本�
 </script>
 ```
 
-1. 我们的  sdk 部署在 `http://collect.trc.com/index.js`  上，通过异步方式加载到你的项目中
+1. 我们的  sdk 部署在 `http://collect.xxx.com/index.js`  上，通过异步方式加载到你的项目中
 2. 定义采集配置对象 _XT 
 3. Target 是无埋点采集行为的配置对象，可以采集配置的 html 元素的所有的点击事件，考虑流量问题，需要慎用，如果不进行无埋点采集，可以不添加 Target 配置
 
@@ -65,20 +65,20 @@ storeUserId 是 SDK 暴露出的存储 userId 的方法，根据采集时间是�
 为了统一各个环境的代码，项目内通讯使用的是域名通讯，对接的时候请在自己的电脑上配置 域名映射，具体配置如下：
 
 ```
-10.50.1.30  collect.trc.com
-10.50.1.30  collectiframe.trc.com
+10.50.1.30  collect.xxx.com
+10.50.1.30  collectiframe.xxx.com
 ```
 
 #### 联调
 
 嵌入采集脚本之后，会默认调用`isupload`接口来判断是否采集页面加载及页面间的跳转信息，接入方接入之后可以通过查看浏览器的 Debug 工具 Network 看请求是否正常发送
 
-1. isUpload 接口 : http://collect.trc.com/rest/collect/isupload/app/v1/?dcpChannelCode=ve3dC41i&device=3&random=0.49842804159284904
+1. isUpload 接口 : http://collect.xxx.com/rest/collect/isupload/app/v1/?dcpChannelCode=ve3dC41i&device=3&random=0.49842804159284904
 2. isUpload 没有返回内容，是否采集事件根据 isUpload 的 http 状态码进行判断，403 表示不采集，其他 code 默认采集 
 
 如果 isUpload 判断采集页面加载及页面跳转信息，sdk 会继续发送事件
 
-1.  设备信息采集接口：http://collect.trc.com/rest/collect/device/h5/v1/?dcpChannelCode=ve3dC41i 
+1.  设备信息采集接口：http://collect.xxx.com/rest/collect/device/h5/v1/?dcpChannelCode=ve3dC41i 
 
    设备信息采集接口参数结构如下：
 
@@ -91,7 +91,7 @@ storeUserId 是 SDK 暴露出的存储 userId 的方法，根据采集时间是�
 
    ​
 
-2.  事件采集接口：http://collect.trc.com/rest/collect/event/h5/v1/?dcpChannelCode=ve3dC41i 
+2.  事件采集接口：http://collect.xxx.com/rest/collect/event/h5/v1/?dcpChannelCode=ve3dC41i 
 
     a. 页面加载发送 `beforeload` 和`loaded` 事件
 
@@ -133,15 +133,6 @@ storeUserId 是 SDK 暴露出的存储 userId 的方法，根据采集时间是�
        "appSessionId": "2c3fca2bc38aa95f3d0877b824eee00a"
    }
    ```
-## DCP 项目部署checkList
-
-前端项目地址： 
-
-    	git@rep.360taihe.com:dcp/web-sdk.git   // git 协议地址
-    
-    	https://rep.360taihe.com/dcp/web-sdk   // http 协议地址
-
-
 
 前端 nginx 配置，2个配置文件 
 
@@ -149,7 +140,7 @@ storeUserId 是 SDK 暴露出的存储 userId 的方法，根据采集时间是�
 
     	server {
         listen 80;
-        server_name collect.trc.com;   //线上测试都部署这个域名，不可变
+        server_name collect.xxx.com;   //线上测试都部署这个域名，不可变
     	
         location / {
           root    /users/dtx/Documents/newWorkSpace/web-sdk;
@@ -157,7 +148,6 @@ storeUserId 是 SDK 暴露出的存储 userId 的方法，根据采集时间是�
         }
     
         location ^~ /rest/collect/ {
-    	#proxy_pass  http://10.200.4.124:10000/rest/collect/;
     	proxy_pass  http://10.200.143.21:10000/rest/collect/;
         }    
       }
@@ -166,7 +156,7 @@ storeUserId 是 SDK 暴露出的存储 userId 的方法，根据采集时间是�
 
     server {
         listen 80;
-        server_name collectiframe.trc.com;
+        server_name collectiframe.xxx.com;
     
         location / {
           root    /users/dtx/Documents/newWorkSpace/web-sdk;
@@ -175,7 +165,7 @@ storeUserId 是 SDK 暴露出的存储 userId 的方法，根据采集时间是�
       
       }
 
-注意事项，这两个 nginx 配置指向的文件目录相同，index 指向文件不同，部署启动之后请访问域名，collectiframe.trc.com 和 collect.trc.com 确保项目启动成功
+注意事项，这两个 nginx 配置指向的文件目录相同，index 指向文件不同，部署启动之后请访问域名，collectiframe.xxx.com 和 collect.xxx.com 确保项目启动成功
 
    ​
 
