@@ -114,9 +114,9 @@ var sdk = (function(root) {
 
 		//初始化采集对象
 		var collect = {
-				deviceUrl:'http://collect.trc.com/rest/collect/device/h5/v1',
-				eventUrl:'http://collect.trc.com/rest/collect/event/h5/v1',
-				isuploadUrl:'http://collect.trc.com/rest/collect/isupload/app/v1',
+				deviceUrl:'http://collect.xxx.com/rest/collect/device/h5/v1',
+				eventUrl:'http://collect.xxx.com/rest/collect/event/h5/v1',
+				isuploadUrl:'http://collect.xxx.com/rest/collect/isupload/app/v1',
 				parmas:{ ExtraInfo:{} },
 				device:{}
 		};
@@ -424,7 +424,7 @@ var sdk = (function(root) {
 				var that = this
 				var iframe = document.createElement('iframe')
 				iframe.id = "frame",
-				iframe.src = 'http://collectiframe.trc.com'
+				iframe.src = 'http://collectiframe.xxx.com'
 				iframe.style.display='none'
 				document.body.appendChild(iframe)
 
