@@ -112,14 +112,24 @@ var sdk = (function(root) {
 				return a.href;
 		}
 
+		//拷贝元素
+		helper.copyObj = function (copyObj) {
+				var obj = {};
+				for ( var i in copyObj) {
+						obj[i] = copyObj[i];
+				}
+				return obj;
+		}
+
 		//初始化采集对象
 		var collect = {
-				deviceUrl:'http://collect.xxx.com/rest/collect/device/h5/v1',
-				eventUrl:'http://collect.xxx.com/rest/collect/event/h5/v1',
-				isuploadUrl:'http://collect.xxx.com/rest/collect/isupload/app/v1',
+				deviceUrl:'//collect.xxx.com/rest/collect/device/h5/v1',
+				eventUrl:'//collect.xxx.com/rest/collect/event/h5/v1',
+				isuploadUrl:'//collect.xxx.com/rest/collect/isupload/app/v1',
 				parmas:{ ExtraInfo:{} },
 				device:{}
 		};
+
 
 		//设置设备信息
 		collect.setDevice = function () {
@@ -337,19 +347,47 @@ var sdk = (function(root) {
 		//onpopstate 事件回调函数
 		collect.onPopStateHandler = function () {
 				if(collect.loadEventSend){
-						collect.parmas.Event = 'unload'
 						if(collect.parmas && collect.parmas.CurrentTime && (new Date().getTime()-collect.parmas.CurrentTime) > 100){
-								collect.parmas.CurrentTime = new Date().getTime()
-								collect.setParames();
-								collect.saveEventInfo()
 
-								setTimeout(function () {
-										collect.parmas.Event = 'insideload'
+								if(typeof Promise == 'function'){
+										var runAsync = function(){
+												var p = new Promise(function(resolve, reject){
+														collect.parmas.Event = 'unload'
+														collect.parmas.CurrentTime = new Date().getTime()
+														collect.current = collect.origin
+														collect.setParames();
+														collect.saveEventInfo()
+														resolve()
+												});
+												return p;
+										}
+										runAsync().then(function () {
+												collect.parmas.Event = 'insideload'
+												sessionStorage.setItem('PageSessionID',helper.uuid())
+												collect.current = document.URL
+												collect.setParames();
+												collect.saveEventInfo()
+
+												collect.origin = document.URL
+										})
+								}else {
+										//TODO 全局清理 unload 自定义事件传入的参数，在发其他请求的时候不发
+										collect.parmas.Event = 'unload'
+										collect.parmas.CurrentTime = new Date().getTime()
+										collect.current = collect.origin
 										collect.setParames();
 										collect.saveEventInfo()
-										sessionStorage.setItem('PageSessionID',helper.uuid())
-										collect.origin = document.URL
-								},1000)
+
+										setTimeout(function () {
+												collect.parmas.Event = 'insideload'
+												sessionStorage.setItem('PageSessionID',helper.uuid())
+												collect.current = document.URL
+												collect.setParames();
+												collect.saveEventInfo()
+
+												collect.origin = document.URL
+										},1000)
+								}
 						}
 				}
 		}
@@ -357,19 +395,19 @@ var sdk = (function(root) {
 		//onpushstate 事件回调
 		collect.onPushStateHandler = function (_state) {
 				if(collect.loadEventSend){
-						collect.parmas.Event = 'unload'
 						if(collect.parmas && collect.parmas.CurrentTime && (new Date().getTime()-collect.parmas.CurrentTime) > 100){
+								collect.parmas.Event = 'unload'
 								collect.parmas.CurrentTime = new Date().getTime()
-								collect.current = helper.normalize(_state.url)
 								collect.setParames();
 								collect.saveEventInfo()
 
 								setTimeout(function () {
 										collect.parmas.Event = 'insideload'
+										sessionStorage.setItem('PageSessionID',helper.uuid())
 										collect.current = helper.normalize(_state.url)
 										collect.setParames();
 										collect.saveEventInfo()
-										sessionStorage.setItem('PageSessionID',helper.uuid())
+
 										collect.origin = document.URL
 								},1000)
 						}
@@ -395,7 +433,7 @@ var sdk = (function(root) {
 				collect.parmas.Event = 'beforeload'
 				collect.parmas.CurrentTime = new Date().getTime()
 				collect.setParames();
-				collect.beforeload = collect.getParames()
+				collect.beforeload = helper.copyObj(collect.getParames())
 		}
 
 		//存储加载完成，获取设备类型，记录加载完成信息
@@ -413,7 +451,7 @@ var sdk = (function(root) {
 				collect.parmas.Event = 'loaded'
 				collect.parmas.CurrentTime = new Date().getTime()
 				collect.setParames();
-				collect.loaded = collect.getParames()
+				collect.loaded = helper.copyObj(collect.getParames())
 				collect.origin = document.URL
 				collect.isupload(collect.isuploadUrl)
 
@@ -424,7 +462,7 @@ var sdk = (function(root) {
 				var that = this
 				var iframe = document.createElement('iframe')
 				iframe.id = "frame",
-				iframe.src = 'http://collectiframe.xxx.com'
+						iframe.src = '//collectiframe.xxx.com'
 				iframe.style.display='none'
 				document.body.appendChild(iframe)
 
@@ -435,9 +473,9 @@ var sdk = (function(root) {
 				//监听message事件
 				helper.on(window,"message",function(event){
 						console.log('监听message事n setIframe',event)
-						that.deviceId = event.data.deviceId
+						that.deviceId = that.deviceId ? that.deviceId : event.data
 
-						if(event.data && event.data.type == 'loaded'){
+						if(event.data){
 								that.sendDevice(that.getDevice(), that.deviceUrl);
 								setTimeout(function () {
 										that.send(that.beforeload)
@@ -515,24 +553,30 @@ var sdk = (function(root) {
 
 				(function(history){
 						var replaceState = history.replaceState;
-						history.replaceState = function(state, param) {
-								var url = arguments[2];
-								if (typeof collect.onPushStateHandler == "function") {
-										collect.onPushStateHandler({state: state, param: param, url: url});
-								}
-								return replaceState.apply(history, arguments);
-						};
+						if(replaceState){
+								history.replaceState = function(state, param) {
+										var url = arguments[2];
+										if (typeof collect.onPushStateHandler == "function") {
+												collect.onPushStateHandler({state: state, param: param, url: url});
+										}
+										return replaceState.apply(history, arguments);
+								};
+						}
+
 				})(window.history);
 
 				(function(history){
 						var pushState = history.pushState;
-						history.pushState = function(state, param) {
-								var url = arguments[2];
-								if (typeof collect.onPushStateHandler == "function") {
-										collect.onPushStateHandler({state: state, param: param, url: url});
-								}
-								return pushState.apply(history, arguments);
-						};
+						if(pushState){
+								history.pushState = function(state, param) {
+										var url = arguments[2];
+										if (typeof collect.onPushStateHandler == "function") {
+												collect.onPushStateHandler({state: state, param: param, url: url});
+										}
+										return pushState.apply(history, arguments);
+								};
+						}
+
 				})(window.history);
 
 				if ((document.readyState=='complete' || document.readyState=='interactive')&&!collect.isloaded) {
