@@ -26,44 +26,44 @@
 
 </body>
 <script>
-		(function() {
-				var collect = document.createElement('script');
-				collect.type = 'text/javascript';
-				collect.async = true;
-				collect.src =  'http://collect.xxx.com/index.js';
-				var s = document.getElementsByTagName('script')[0];
-				s.parentNode.insertBefore(collect, s);
-		})();
+	(function() {
+		var collect = document.createElement('script');
+		collect.type = 'text/javascript';
+		collect.async = true;
+		collect.src =  'http://collect.xxx.com/index.js';
+		var s = document.getElementsByTagName('script')[0];
+		s.parentNode.insertBefore(collect, s);
+	})();
 
-		var _XT = [];
+	var _XT = [];
 
-  	_XT.push(['Target','div']);
+	_XT.push(['Target','div']);
 
-		// 用户自定义收集字段
-		_XT.userConfig = {
-				dcpChannelCode: 've3dC41i'
-		};
+	// 用户自定义收集字段
+	_XT.userConfig = {
+		dcpChannelCode: 've3dC41i'
+	};
 
-		var customerEventDOM = document.getElementById('customer-event')
-		var errorEventDOM = document.getElementById('error-event')
-		var userIdEventDOM = document.getElementById('userId-event')
+	var customerEventDOM = document.getElementById('customer-event')
+	var errorEventDOM = document.getElementById('error-event')
+	var userIdEventDOM = document.getElementById('userId-event')
 
-		errorExtraInfo = {'errorCode':500}
+	errorExtraInfo = {'errorCode':500}
 
-		customerEventDOM.onclick = function () {
-				console.log('自定义事件')
-				sdk.dispatch('customEvent',customerEventDOM,{extraInfo:'extraInfo'})
-		}
+	customerEventDOM.onclick = function () {
+		console.log('自定义事件')
+		sdk.dispatch('customEvent',customerEventDOM,{extraInfo:'extraInfo'})
+	}
 
-		errorEventDOM.onclick = function () {
-				console.log('某个 http 接口返回 500 了')
-				sdk.dispatch('httpError',errorEventDOM,errorExtraInfo)
-		}
+	errorEventDOM.onclick = function () {
+		console.log('某个 http 接口返回 500 了')
+		sdk.dispatch('httpError',errorEventDOM,errorExtraInfo)
+	}
 
-		userIdEventDOM.onclick = function () {
-				console.log('存储UserId')
-				sdk.storeUserId('test1111')
-		}
+	userIdEventDOM.onclick = function () {
+		console.log('存储UserId')
+		sdk.storeUserId('test1111')
+	}
 
 </script>
 </html>
